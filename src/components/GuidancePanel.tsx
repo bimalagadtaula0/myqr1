@@ -1,96 +1,54 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Square } from "lucide-react";
 import { useSpeech } from "@/hooks/useSpeech";
+import { useNavigation } from "@/lib/navigation";
 
-type Step = {
-  title: string;
-  detail: string;
-  icon: string;
-  upcoming?: string;
-};
-
-const STEPS: Step[] = [
-  {
-    icon: "🚪",
-    title: "Leave changing room",
-    detail: "Exit through the wide door on your right.",
-    upcoming: "Next, follow the blue accessible boardwalk.",
-  },
-  {
-    icon: "🧭",
-    title: "Follow the blue path",
-    detail: "Stay on the marked accessible route. Surface is smooth and step-free.",
-    upcoming: "In about 20 meters you will pass the kiosk on your left.",
-  },
-  {
-    icon: "🍹",
-    title: "Pass the kiosk",
-    detail: "There's a rest area here if you need a break.",
-    upcoming: "Next, turn right toward the shower.",
-  },
-  {
-    icon: "🚿",
-    title: "Turn right to the shower",
-    detail: "Ramp at entrance. No steps. You have arrived at your destination.",
-  },
-];
-
-const ACCESSIBILITY_INFO = [
-  { icon: "♿", label: "Ramp available at shower entrance" },
-  { icon: "🚻", label: "Accessible toilet 20m away" },
-  { icon: "🪑", label: "Rest area at the kiosk" },
-  { icon: "💧", label: "Drinking water along the route" },
-];
-
-function buildSpoken(step: Step, index: number, total: number) {
-  const position = `Step ${index + 1} of ${total}.`;
-  const upcoming = step.upcoming ? ` ${step.upcoming}` : " You have arrived.";
-  return `${position} ${step.title}. ${step.detail}${upcoming}`;
+function buildSpoken(step: { title: string; detail: string; upcoming?: string }, i: number, total: number) {
+  return `Step ${i + 1} of ${total}. ${step.title}. ${step.detail}${step.upcoming ? " " + step.upcoming : " You have arrived."}`;
 }
 
 export function GuidancePanel() {
+  const { profile, audioOn, setAudioOn } = useNavigation();
+  const steps = profile.route.steps;
   const [active, setActive] = useState(0);
-  const [audioOn, setAudioOn] = useState(false);
   const { supported, speaking, speak, stop } = useSpeech();
 
-  // Auto-speak when audio guidance is on and active step changes
+  // Reset to first step when profile changes
+  useEffect(() => {
+    setActive(0);
+  }, [profile.id]);
+
+  // Auto-speak when audio is on and step changes
   useEffect(() => {
     if (audioOn && supported) {
-      speak(buildSpoken(STEPS[active], active, STEPS.length));
+      speak(buildSpoken(steps[active], active, steps.length));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, audioOn]);
+  }, [active, audioOn, profile.id]);
 
   const toggleAudio = () => {
-    if (audioOn) {
-      stop();
-      setAudioOn(false);
-    } else {
-      setAudioOn(true);
-    }
+    if (audioOn) { stop(); setAudioOn(false); }
+    else setAudioOn(true);
   };
 
   const replay = () => {
     if (!supported) return;
-    if (speaking) {
-      stop();
-    } else {
-      speak(buildSpoken(STEPS[active], active, STEPS.length));
-    }
+    if (speaking) stop();
+    else speak(buildSpoken(steps[active], active, steps.length));
   };
 
-  const goPrev = () => setActive((i) => Math.max(0, i - 1));
-  const goNext = () => setActive((i) => Math.min(STEPS.length - 1, i + 1));
+  const step = steps[active];
 
   return (
-    <div className="flex h-full flex-col gap-5 overflow-y-auto rounded-3xl border-2 border-border bg-card p-6">
+    <div className="flex h-full flex-col gap-5 overflow-y-auto rounded-3xl border-2 border-border bg-card p-6 animate-fade-in">
       <header>
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Destination
+              {profile.icon} {profile.label} mode
             </p>
             <h2 className="mt-1 text-2xl font-bold leading-tight">Shower Area</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{profile.route.label}</p>
           </div>
 
           {supported && (
@@ -111,31 +69,30 @@ export function GuidancePanel() {
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">
-          <Pill icon="⏱" label="2 min" />
-          <Pill icon="📏" label="80 m" />
+          <Pill icon="⏱" label={`${profile.route.minutes} min`} />
+          <Pill icon="📏" label={`${profile.route.distanceM} m`} />
           <Pill icon="♿" label="Step-free" tone="success" />
         </div>
       </header>
 
-      {/* Active step large card */}
       <section
         aria-label="Current step"
         aria-live="polite"
-        className="rounded-2xl border-2 border-primary bg-primary/5 p-4"
+        className="rounded-2xl border-2 border-primary bg-primary/5 p-4 animate-scale-in"
+        key={`${profile.id}-${active}`}
       >
         <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-primary">
-          <span>Step {active + 1} of {STEPS.length}</span>
-          {speaking && <span className="inline-flex items-center gap-1">🔈 Speaking…</span>}
+          <span>Step {active + 1} of {steps.length}</span>
+          {speaking && <span>🔈 Speaking…</span>}
         </div>
         <div className="mt-2 flex items-start gap-3">
-          <span aria-hidden className="text-3xl">{STEPS[active].icon}</span>
+          <span aria-hidden className="text-3xl">{step.icon}</span>
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-bold leading-tight">{STEPS[active].title}</h3>
-            <p className="mt-1 text-sm text-foreground/80">{STEPS[active].detail}</p>
-            {STEPS[active].upcoming && (
+            <h3 className="text-lg font-bold leading-tight">{step.title}</h3>
+            <p className="mt-1 text-sm text-foreground/80">{step.detail}</p>
+            {step.upcoming && (
               <p className="mt-2 rounded-xl bg-secondary px-3 py-2 text-sm font-medium">
-                <span aria-hidden className="mr-1">➡️</span>
-                {STEPS[active].upcoming}
+                <span aria-hidden className="mr-1">➡️</span>{step.upcoming}
               </p>
             )}
           </div>
@@ -143,15 +100,15 @@ export function GuidancePanel() {
 
         <div className="mt-4 flex items-center gap-2">
           <button
-            onClick={goPrev}
+            onClick={() => setActive((i) => Math.max(0, i - 1))}
             disabled={active === 0}
             className="flex h-10 items-center gap-1 rounded-full border-2 border-border bg-card px-3 text-sm font-semibold transition hover:border-primary disabled:opacity-40"
           >
             <ChevronLeft size={18} /> Prev
           </button>
           <button
-            onClick={goNext}
-            disabled={active === STEPS.length - 1}
+            onClick={() => setActive((i) => Math.min(steps.length - 1, i + 1))}
+            disabled={active === steps.length - 1}
             className="flex h-10 flex-1 items-center justify-center gap-1 rounded-full bg-primary px-4 text-sm font-bold text-primary-foreground transition hover:opacity-90 disabled:opacity-40"
           >
             Next step <ChevronRight size={18} />
@@ -173,7 +130,7 @@ export function GuidancePanel() {
           Step by step
         </h3>
         <ol className="space-y-2">
-          {STEPS.map((step, i) => {
+          {steps.map((s, i) => {
             const isActive = i === active;
             const isDone = i < active;
             return (
@@ -188,19 +145,17 @@ export function GuidancePanel() {
                 >
                   <div
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base font-bold ${
-                      isDone
-                        ? "bg-success text-success-foreground"
-                        : "bg-primary text-primary-foreground"
+                      isDone ? "bg-success text-success-foreground" : "bg-primary text-primary-foreground"
                     }`}
                   >
                     {isDone ? "✓" : i + 1}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 font-semibold">
-                      <span aria-hidden>{step.icon}</span>
-                      <span>{step.title}</span>
+                      <span aria-hidden>{s.icon}</span>
+                      <span>{s.title}</span>
                     </div>
-                    <p className="mt-0.5 text-sm text-muted-foreground">{step.detail}</p>
+                    <p className="mt-0.5 text-sm text-muted-foreground">{s.detail}</p>
                   </div>
                 </button>
               </li>
@@ -209,18 +164,18 @@ export function GuidancePanel() {
         </ol>
       </section>
 
-      <section aria-label="Accessibility info">
+      <section aria-label="Route notes">
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Accessibility info
+          What to expect
         </h3>
         <ul className="space-y-2">
-          {ACCESSIBILITY_INFO.map((item) => (
+          {profile.route.notes.map((n) => (
             <li
-              key={item.label}
-              className="flex items-center gap-3 rounded-xl bg-secondary px-3 py-2 text-sm font-medium"
+              key={n}
+              className="flex items-center gap-3 rounded-xl bg-secondary px-3 py-2 text-sm font-medium animate-fade-in"
             >
-              <span aria-hidden className="text-base">{item.icon}</span>
-              <span>{item.label}</span>
+              <span aria-hidden>✓</span>
+              <span>{n}</span>
             </li>
           ))}
         </ul>
@@ -241,23 +196,13 @@ export function GuidancePanel() {
   );
 }
 
-function Pill({
-  icon,
-  label,
-  tone = "default",
-}: {
-  icon: string;
-  label: string;
-  tone?: "default" | "success";
-}) {
+function Pill({ icon, label, tone = "default" }: { icon: string; label: string; tone?: "default" | "success" }) {
   const cls =
     tone === "success"
       ? "bg-success/20 text-success-foreground border-success/40"
       : "bg-secondary text-secondary-foreground border-border";
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${cls}`}
-    >
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${cls}`}>
       <span aria-hidden>{icon}</span>
       {label}
     </span>

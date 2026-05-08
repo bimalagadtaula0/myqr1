@@ -25,19 +25,17 @@ function Index() {
       <main className="mx-auto max-w-[1440px] px-4 py-4 sm:px-6 sm:py-6">
         <h1 className="sr-only">Accessible navigation</h1>
 
-        <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr] lg:gap-6">
-          {/* Left: spatial understanding */}
+        <div className="grid gap-4 md:grid-cols-[1.5fr_1fr] md:gap-5 lg:grid-cols-[1.6fr_1fr] lg:gap-6">
           <section
             aria-label="Map"
-            className="h-[68vh] min-h-[480px] lg:h-[calc(100vh-7rem)]"
+            className="h-[60vh] min-h-[420px] md:h-[calc(100vh-6.5rem)]"
           >
             <AccessibleMap />
           </section>
 
-          {/* Right: cognitive guidance */}
           <section
             aria-label="Route guidance"
-            className="h-auto lg:h-[calc(100vh-7rem)]"
+            className="md:h-[calc(100vh-6.5rem)]"
           >
             <GuidancePanel />
           </section>

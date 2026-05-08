@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { AccessibleMap } from "@/components/AccessibleMap";
 import { GuidancePanel } from "@/components/GuidancePanel";
+import { NavigationProvider } from "@/lib/navigation";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -19,28 +20,30 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
+    <NavigationProvider>
+      <div className="min-h-screen bg-background text-foreground">
+        <SiteHeader />
 
-      <main className="mx-auto max-w-[1440px] px-4 py-4 sm:px-6 sm:py-6">
-        <h1 className="sr-only">Accessible navigation</h1>
+        <main className="mx-auto max-w-[1440px] px-4 py-4 sm:px-6 sm:py-6">
+          <h1 className="sr-only">Accessible navigation</h1>
 
-        <div className="grid gap-4 md:grid-cols-[1.5fr_1fr] md:gap-5 lg:grid-cols-[1.6fr_1fr] lg:gap-6">
-          <section
-            aria-label="Map"
-            className="h-[60vh] min-h-[420px] md:h-[calc(100vh-6.5rem)]"
-          >
-            <AccessibleMap />
-          </section>
+          <div className="grid gap-4 md:grid-cols-[1.5fr_1fr] md:gap-5 lg:grid-cols-[1.6fr_1fr] lg:gap-6">
+            <section
+              aria-label="Map"
+              className="h-[60vh] min-h-[420px] md:h-[calc(100vh-6.5rem)]"
+            >
+              <AccessibleMap />
+            </section>
 
-          <section
-            aria-label="Route guidance"
-            className="md:h-[calc(100vh-6.5rem)]"
-          >
-            <GuidancePanel />
-          </section>
-        </div>
-      </main>
-    </div>
+            <section
+              aria-label="Route guidance"
+              className="md:h-[calc(100vh-6.5rem)]"
+            >
+              <GuidancePanel />
+            </section>
+          </div>
+        </main>
+      </div>
+    </NavigationProvider>
   );
 }

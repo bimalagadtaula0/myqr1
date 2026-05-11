@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Square } from "lucide-react";
+import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Square, Navigation, X } from "lucide-react";
 import { useSpeech } from "@/hooks/useSpeech";
 import { useNavigation } from "@/lib/navigation";
+
+type NavState = "preview" | "active" | "arrived";
+
 
 function buildSpoken(step: { title: string; detail: string; upcoming?: string }, i: number, total: number) {
   return `Step ${i + 1} of ${total}. ${step.title}. ${step.detail}${step.upcoming ? " " + step.upcoming : " You have arrived."}`;
@@ -11,11 +14,13 @@ export function GuidancePanel() {
   const { profile, audioOn, setAudioOn } = useNavigation();
   const steps = profile.route.steps;
   const [active, setActive] = useState(0);
+  const [navState, setNavState] = useState<NavState>("preview");
   const { supported, speaking, speak, stop } = useSpeech();
 
-  // Reset to first step when profile changes
+  // Reset on profile change
   useEffect(() => {
     setActive(0);
+    setNavState("preview");
   }, [profile.id]);
 
   // Auto-speak when audio is on and step changes
@@ -56,14 +61,14 @@ export function GuidancePanel() {
               onClick={toggleAudio}
               aria-pressed={audioOn}
               aria-label={audioOn ? "Turn off audio guidance" : "Turn on audio guidance"}
-              className={`flex items-center gap-2 rounded-full border-2 px-3 py-2 text-sm font-semibold transition ${
+              title={audioOn ? "Audio on" : "Audio off"}
+              className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition ${
                 audioOn
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-card hover:border-primary"
               }`}
             >
               {audioOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
-              <span className="hidden sm:inline">{audioOn ? "Audio on" : "Audio"}</span>
             </button>
           )}
         </div>
@@ -73,6 +78,34 @@ export function GuidancePanel() {
           <Pill icon="📏" label={`${profile.route.distanceM} m`} />
           <Pill icon="♿" label="Step-free" tone="success" />
         </div>
+
+        {navState === "preview" && (
+          <button
+            onClick={() => { setNavState("active"); setActive(0); }}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-sm transition hover:opacity-90"
+          >
+            <Navigation size={18} /> Start navigation
+          </button>
+        )}
+        {navState === "active" && (
+          <button
+            onClick={() => { setNavState("preview"); setActive(0); stop(); }}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border-2 border-destructive bg-card px-4 py-2.5 text-sm font-bold text-destructive transition hover:bg-destructive/10"
+          >
+            <X size={16} /> End route
+          </button>
+        )}
+        {navState === "arrived" && (
+          <div className="mt-4 rounded-2xl border-2 border-success bg-success/15 p-3 text-center text-sm font-bold text-success-foreground">
+            🎉 You have arrived
+            <button
+              onClick={() => { setNavState("preview"); setActive(0); }}
+              className="ml-3 rounded-full bg-card px-3 py-1 text-xs font-semibold text-foreground"
+            >
+              Start over
+            </button>
+          </div>
+        )}
       </header>
 
       <section
@@ -107,8 +140,14 @@ export function GuidancePanel() {
             <ChevronLeft size={18} /> Prev
           </button>
           <button
-            onClick={() => setActive((i) => Math.min(steps.length - 1, i + 1))}
-            disabled={active === steps.length - 1}
+            onClick={() => {
+              setActive((i) => {
+                const next = Math.min(steps.length - 1, i + 1);
+                if (next === steps.length - 1) setNavState("arrived");
+                return next;
+              });
+            }}
+            disabled={active === steps.length - 1 || navState === "preview"}
             className="flex h-10 flex-1 items-center justify-center gap-1 rounded-full bg-primary px-4 text-sm font-bold text-primary-foreground transition hover:opacity-90 disabled:opacity-40"
           >
             Next step <ChevronRight size={18} />

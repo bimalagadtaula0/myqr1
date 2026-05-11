@@ -118,3 +118,9 @@
   stroke-dasharray: 10 8;
 }
 
+
+/* Global accessibility helpers controlled by SettingsDock */
+html[data-textsize="large"] { font-size: 17.5px; }
+html[data-textsize="xlarge"] { font-size: 20px; }
+html.hc { --background: oklch(1 0 0); --foreground: oklch(0.12 0.02 260); --border: oklch(0.18 0.02 260); --primary: oklch(0.32 0.22 265); }
+html.hc body { filter: contrast(1.08); }

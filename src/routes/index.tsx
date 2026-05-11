@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { AccessibleMap } from "@/components/AccessibleMap";
 import { GuidancePanel } from "@/components/GuidancePanel";
+import { SettingsDock } from "@/components/SettingsDock";
 import { NavigationProvider } from "@/lib/navigation";
 
 export const Route = createFileRoute("/")({
@@ -43,6 +44,8 @@ function Index() {
             </section>
           </div>
         </main>
+
+        <SettingsDock />
       </div>
     </NavigationProvider>
   );

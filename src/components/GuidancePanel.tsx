@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Square } from "lucide-react";
+import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Square, Navigation, X } from "lucide-react";
 import { useSpeech } from "@/hooks/useSpeech";
 import { useNavigation } from "@/lib/navigation";
+
+type NavState = "preview" | "active" | "arrived";
+
 
 function buildSpoken(step: { title: string; detail: string; upcoming?: string }, i: number, total: number) {
   return `Step ${i + 1} of ${total}. ${step.title}. ${step.detail}${step.upcoming ? " " + step.upcoming : " You have arrived."}`;
@@ -11,11 +14,13 @@ export function GuidancePanel() {
   const { profile, audioOn, setAudioOn } = useNavigation();
   const steps = profile.route.steps;
   const [active, setActive] = useState(0);
+  const [navState, setNavState] = useState<NavState>("preview");
   const { supported, speaking, speak, stop } = useSpeech();
 
-  // Reset to first step when profile changes
+  // Reset on profile change
   useEffect(() => {
     setActive(0);
+    setNavState("preview");
   }, [profile.id]);
 
   // Auto-speak when audio is on and step changes

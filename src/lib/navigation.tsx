@@ -58,8 +58,8 @@ export const PROFILES: Record<ProfileId, Profile> = {
       distanceM: 60,
       minutes: 1,
       steps: [
-        { icon: "🚪", title: "Leave changing room", detail: "Head out and turn slightly right.", upcoming: "Cross the sand toward the boardwalk." },
-        { icon: "🧭", title: "Cut across the boardwalk", detail: "Direct diagonal toward the kiosk.", upcoming: "Continue past the kiosk." },
+        { icon: "🚪", title: "Leave the changing room", detail: "Exit and turn slightly right toward the boardwalk.", upcoming: "Head diagonally toward the kiosk." },
+        { icon: "🧭", title: "Head toward the kiosk", detail: "Walk diagonally across the boardwalk.", upcoming: "Continue past the kiosk on your right." },
         { icon: "🍹", title: "Pass the kiosk", detail: "Keep heading right.", upcoming: `Shower ${baseShower} is 20m ahead.` },
         { icon: "🚿", title: "Arrive at the shower", detail: "You have arrived." },
       ],

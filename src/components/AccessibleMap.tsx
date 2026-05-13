@@ -153,58 +153,58 @@ export function AccessibleMap() {
       </div>
 
       {/* Compass (counter-rotates with map) */}
-      <div className="absolute right-4 top-4 z-20 flex h-12 w-12 items-center justify-center rounded-full border-2 border-border bg-card text-xs font-bold shadow-sm">
+      <div className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border-2 border-border bg-card text-[10px] font-bold shadow-sm sm:right-4 sm:top-4 sm:h-12 sm:w-12 sm:text-xs">
         <span
           className="flex flex-col items-center leading-none transition-transform duration-300"
           style={{ transform: `rotate(${-rotation}deg)` }}
         >
           <span className="text-primary">N</span>
-          <span className="mt-0.5 text-base">↑</span>
+          <span className="mt-0.5 text-sm sm:text-base">↑</span>
         </span>
       </div>
 
       {/* Profile chip */}
-      <div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full border-2 border-border bg-card/95 px-3 py-1.5 text-xs font-semibold shadow-sm backdrop-blur animate-fade-in">
+      <div className="absolute left-3 top-3 z-20 flex max-w-[55%] items-center gap-1.5 rounded-full border-2 border-border bg-card/95 px-2.5 py-1 text-[11px] font-semibold shadow-sm backdrop-blur animate-fade-in sm:left-4 sm:top-4 sm:gap-2 sm:px-3 sm:py-1.5 sm:text-xs">
         <span aria-hidden>{profile.icon}</span>
-        <span>{profile.label} mode</span>
+        <span className="truncate">{profile.label} mode</span>
         {audioOn && <span aria-hidden title="Audio on">🔈</span>}
       </div>
 
       {/* Beach label */}
-      <div className="absolute left-1/2 top-6 z-10 -translate-x-1/2 text-sm font-semibold tracking-wide text-primary">
+      <div className="absolute left-1/2 top-14 z-10 -translate-x-1/2 text-xs font-semibold tracking-wide text-primary sm:top-6 sm:text-sm">
         🌊 Beach Area
       </div>
 
       {/* Map controls */}
-      <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-1.5 rounded-2xl border-2 border-border bg-card/95 p-1.5 shadow-md backdrop-blur">
-        <MapBtn label="Zoom in" onClick={zoomIn} disabled={zoom >= 2}><Plus size={16} /></MapBtn>
-        <MapBtn label="Zoom out" onClick={zoomOut} disabled={zoom <= 0.8}><Minus size={16} /></MapBtn>
-        <MapBtn label="Recenter on me" onClick={recenter}><LocateFixed size={16} /></MapBtn>
-        <MapBtn label="Rotate map" onClick={rotate}><RotateCw size={16} /></MapBtn>
+      <div className="absolute bottom-3 right-3 z-20 flex flex-col gap-1 rounded-2xl border-2 border-border bg-card/95 p-1 shadow-md backdrop-blur sm:bottom-4 sm:right-4 sm:gap-1.5 sm:p-1.5">
+        <MapBtn label="Zoom in" onClick={zoomIn} disabled={zoom >= 2}><Plus size={14} /></MapBtn>
+        <MapBtn label="Zoom out" onClick={zoomOut} disabled={zoom <= 0.8}><Minus size={14} /></MapBtn>
+        <MapBtn label="Recenter on me" onClick={recenter}><LocateFixed size={14} /></MapBtn>
+        <MapBtn label="Rotate map" onClick={rotate}><RotateCw size={14} /></MapBtn>
       </div>
 
       {/* Legend (collapsible, compact) */}
-      <div className="absolute bottom-4 left-4 z-10 max-w-[60%] rounded-2xl border-2 border-border bg-card/95 text-xs shadow-sm backdrop-blur">
+      <div className="absolute bottom-3 left-3 z-10 max-w-[55%] rounded-xl border-2 border-border bg-card/95 text-[11px] shadow-sm backdrop-blur sm:bottom-4 sm:left-4 sm:max-w-[60%] sm:rounded-2xl sm:text-xs">
         <button
           onClick={() => setLegendOpen((v) => !v)}
-          className="flex w-full items-center justify-between gap-2 px-3 py-2 font-semibold"
+          className="flex w-full items-center justify-between gap-2 px-2.5 py-1.5 font-semibold sm:px-3 sm:py-2"
           aria-expanded={legendOpen}
         >
           <span className="flex items-center gap-2">
-            <span className="inline-block h-1.5 w-6 rounded-full bg-route" />
+            <span className="inline-block h-1.5 w-5 rounded-full bg-route sm:w-6" />
             <span className="truncate">{profile.route.label}</span>
           </span>
-          {legendOpen ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+          {legendOpen ? <ChevronDown size={12} /> : <ChevronUp size={12} />}
         </button>
         {legendOpen && (
-          <div className="border-t border-border px-3 py-2">
+          <div className="border-t border-border px-2.5 py-1.5 sm:px-3 sm:py-2">
             <div className="flex items-center gap-2">
-              <span className="inline-block h-1.5 w-8 rounded-full bg-route" />
+              <span className="inline-block h-1.5 w-6 rounded-full bg-route sm:w-8" />
               <span>{profile.route.distanceM}m · {profile.route.minutes} min</span>
             </div>
             <div className="mt-1 flex items-center gap-2">
               <span
-                className="inline-block w-8"
+                className="inline-block w-6 sm:w-8"
                 style={{
                   backgroundImage:
                     "repeating-linear-gradient(to right, var(--muted-foreground) 0 4px, transparent 4px 8px)",
@@ -237,7 +237,7 @@ function MapBtn({
       aria-label={label}
       title={label}
       disabled={disabled}
-      className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background transition hover:border-primary hover:bg-primary/10 disabled:opacity-40"
+      className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-background transition hover:border-primary hover:bg-primary/10 disabled:opacity-40 sm:h-9 sm:w-9 sm:rounded-xl"
     >
       {children}
     </button>

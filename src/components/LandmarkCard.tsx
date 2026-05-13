@@ -14,20 +14,23 @@ export function LandmarkCard({ icon, label, badge, tone = "default", size = "md"
         ? "bg-warning text-warning-foreground border-warning"
         : "bg-card text-card-foreground border-border";
 
-  const sizeClass = size === "sm" ? "px-3 py-2 text-sm" : "px-4 py-3 text-base";
+  const sizeClass =
+    size === "sm"
+      ? "px-2 py-1.5 text-[11px] sm:px-3 sm:py-2 sm:text-sm"
+      : "px-2.5 py-1.5 text-xs sm:px-4 sm:py-3 sm:text-base";
 
   return (
     <div
-      className={`inline-flex flex-col items-start gap-1 rounded-2xl border-2 shadow-sm ${toneClass} ${sizeClass}`}
+      className={`inline-flex flex-col items-start gap-0.5 rounded-xl border-2 shadow-sm sm:rounded-2xl sm:gap-1 ${toneClass} ${sizeClass}`}
     >
-      <div className="flex items-center gap-2 font-semibold leading-tight">
-        <span aria-hidden className="text-xl">
+      <div className="flex items-center gap-1.5 font-semibold leading-tight sm:gap-2">
+        <span aria-hidden className="text-base sm:text-xl">
           {icon}
         </span>
         <span>{label}</span>
       </div>
       {badge && (
-        <span className="text-xs font-medium opacity-90">{badge}</span>
+        <span className="text-[10px] font-medium opacity-90 sm:text-xs">{badge}</span>
       )}
     </div>
   );

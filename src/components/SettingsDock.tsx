@@ -45,17 +45,17 @@ export function SettingsDock() {
   return (
     <>
       {/* Floating dock */}
-      <div className="fixed bottom-5 left-1/2 z-40 flex -translate-x-1/2 gap-3">
+      <div className="fixed bottom-3 left-1/2 z-40 flex -translate-x-1/2 gap-2 sm:bottom-5 sm:gap-3">
         <DockButton
           tone="voice"
           onClick={() => setOpenVoice(true)}
-          icon={<Headphones size={18} />}
+          icon={<Headphones size={16} />}
           label="Audio & voice"
         />
         <DockButton
           tone="a11y"
           onClick={() => setOpenA11y(true)}
-          icon={<Accessibility size={18} />}
+          icon={<Accessibility size={16} />}
           label="Accessibility"
         />
       </div>
@@ -223,7 +223,7 @@ function DockButton({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 rounded-full bg-gradient-to-r ${grad} px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/30 transition hover:scale-[1.03] active:scale-95`}
+      className={`flex items-center gap-1.5 rounded-full bg-gradient-to-r ${grad} px-3 py-2 text-xs font-bold text-white shadow-lg shadow-primary/30 transition hover:scale-[1.03] active:scale-95 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm`}
     >
       {icon}
       <span>{label}</span>

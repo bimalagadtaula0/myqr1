@@ -45,7 +45,7 @@ export function GuidancePanel() {
   const step = steps[active];
 
   return (
-    <div className="flex h-full flex-col gap-5 overflow-y-auto rounded-3xl border-2 border-border bg-card p-6 animate-fade-in">
+    <div className="flex h-full flex-col gap-4 overflow-y-auto rounded-2xl border-2 border-border bg-card p-4 animate-fade-in sm:gap-5 sm:rounded-3xl sm:p-6">
       <header>
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -165,36 +165,46 @@ export function GuidancePanel() {
       </section>
 
       <section aria-label="All steps">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Step by step
         </h3>
-        <ol className="space-y-2">
+        <ol className="relative space-y-1">
+          {/* Vertical timeline line */}
+          <span
+            aria-hidden
+            className="absolute left-[15px] top-2 bottom-2 w-px bg-border"
+          />
           {steps.map((s, i) => {
             const isActive = i === active;
             const isDone = i < active;
             return (
-              <li key={i}>
+              <li key={i} className="relative">
                 <button
                   onClick={() => setActive(i)}
-                  className={`flex w-full gap-3 rounded-2xl border-2 p-3 text-left transition ${
-                    isActive
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-background hover:border-primary/50"
+                  aria-current={isActive ? "step" : undefined}
+                  className={`group flex w-full items-start gap-3 rounded-xl px-2 py-2 text-left transition ${
+                    isActive ? "bg-primary/5" : "hover:bg-secondary/60"
                   }`}
                 >
                   <div
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base font-bold ${
-                      isDone ? "bg-success text-success-foreground" : "bg-primary text-primary-foreground"
+                    className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ring-4 ring-card transition ${
+                      isDone
+                        ? "bg-success text-success-foreground"
+                        : isActive
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-muted-foreground"
                     }`}
                   >
                     {isDone ? "✓" : i + 1}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 font-semibold">
-                      <span aria-hidden>{s.icon}</span>
-                      <span>{s.title}</span>
+                  <div className="min-w-0 flex-1 pt-1">
+                    <div className={`flex items-center gap-2 text-sm font-semibold leading-tight ${isActive ? "text-foreground" : "text-foreground/80"}`}>
+                      <span aria-hidden className="text-base">{s.icon}</span>
+                      <span className="truncate">{s.title}</span>
                     </div>
-                    <p className="mt-0.5 text-sm text-muted-foreground">{s.detail}</p>
+                    {isActive && (
+                      <p className="mt-1 text-xs text-muted-foreground">{s.detail}</p>
+                    )}
                   </div>
                 </button>
               </li>

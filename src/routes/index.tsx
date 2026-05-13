@@ -31,7 +31,7 @@ function Index() {
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
 
-        <main className="mx-auto max-w-[1440px] px-3 py-3 sm:px-6 sm:py-6">
+        <main className="mx-auto max-w-[1440px] px-3 pb-24 pt-3 sm:px-6 sm:pb-6 sm:pt-6">
           <h1 className="sr-only">Accessible navigation</h1>
 
           {/* Mobile tab switcher */}

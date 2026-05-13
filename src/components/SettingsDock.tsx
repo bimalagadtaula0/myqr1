@@ -45,18 +45,20 @@ export function SettingsDock() {
   return (
     <>
       {/* Floating dock */}
-      <div className="fixed bottom-3 left-1/2 z-40 flex -translate-x-1/2 gap-2 sm:bottom-5 sm:gap-3">
+      <div className="fixed bottom-3 left-1/2 z-40 flex w-[min(92vw,420px)] -translate-x-1/2 items-center justify-center gap-2 sm:bottom-5 sm:w-auto sm:gap-3">
         <DockButton
           tone="voice"
           onClick={() => setOpenVoice(true)}
           icon={<Headphones size={16} />}
-          label="Audio & voice"
+          label="Audio"
+          fullLabel="Audio & voice"
         />
         <DockButton
           tone="a11y"
           onClick={() => setOpenA11y(true)}
           icon={<Accessibility size={16} />}
-          label="Accessibility"
+          label="Access"
+          fullLabel="Accessibility"
         />
       </div>
 
@@ -208,11 +210,13 @@ export function SettingsDock() {
 function DockButton({
   icon,
   label,
+  fullLabel,
   onClick,
   tone,
 }: {
   icon: React.ReactNode;
   label: string;
+  fullLabel?: string;
   onClick: () => void;
   tone: "voice" | "a11y";
 }) {
@@ -223,10 +227,11 @@ function DockButton({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1.5 rounded-full bg-gradient-to-r ${grad} px-3 py-2 text-xs font-bold text-white shadow-lg shadow-primary/30 transition hover:scale-[1.03] active:scale-95 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm`}
+      className={`flex min-w-0 flex-1 items-center justify-center gap-1.5 truncate rounded-full bg-gradient-to-r ${grad} px-3 py-2 text-xs font-bold text-white shadow-lg shadow-primary/30 transition hover:scale-[1.03] active:scale-95 sm:flex-initial sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm`}
     >
       {icon}
-      <span>{label}</span>
+      <span className="truncate sm:hidden">{label}</span>
+      <span className="hidden truncate sm:inline">{fullLabel ?? label}</span>
     </button>
   );
 }

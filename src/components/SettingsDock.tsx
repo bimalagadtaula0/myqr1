@@ -289,17 +289,21 @@ function DockButton({
   fullLabel,
   onClick,
   tone,
+  badge,
 }: {
   icon: React.ReactNode;
   label: string;
   fullLabel?: string;
   onClick: () => void;
-  tone: "voice" | "a11y";
+  tone: "voice" | "a11y" | "route";
+  badge?: string;
 }) {
   const grad =
     tone === "voice"
       ? "from-sky-500 to-violet-600"
-      : "from-violet-600 to-fuchsia-500";
+      : tone === "a11y"
+        ? "from-violet-600 to-fuchsia-500"
+        : "from-emerald-500 to-teal-600";
   return (
     <button
       onClick={onClick}
@@ -308,9 +312,15 @@ function DockButton({
       {icon}
       <span className="truncate sm:hidden">{label}</span>
       <span className="hidden truncate sm:inline">{fullLabel ?? label}</span>
+      {badge && (
+        <span className="ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white/25 px-1.5 text-[11px]" aria-hidden>
+          {badge}
+        </span>
+      )}
     </button>
   );
 }
+
 
 function Section({
   icon,

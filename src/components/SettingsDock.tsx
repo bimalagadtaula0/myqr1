@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Headphones, Accessibility, Play, Square, Mic, MicOff } from "lucide-react";
+import { Headphones, Accessibility, Play, Square, Mic, MicOff, Navigation } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -8,7 +8,7 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { useSpeech } from "@/hooks/useSpeech";
-import { useNavigation } from "@/lib/navigation";
+import { NEEDS, PROFILES, useNavigation, type ProfileId } from "@/lib/navigation";
 
 type Lang = "IT" | "EN" | "FR" | "DE" | "ES";
 type TextSize = "normal" | "large" | "xlarge";
@@ -16,8 +16,9 @@ type TextSize = "normal" | "large" | "xlarge";
 export function SettingsDock() {
   const [openVoice, setOpenVoice] = useState(false);
   const [openA11y, setOpenA11y] = useState(false);
+  const [openRoute, setOpenRoute] = useState(false);
 
-  const { profile, audioOn, setAudioOn } = useNavigation();
+  const { profile, profileId, setProfile, needs, toggleNeed, audioOn, setAudioOn } = useNavigation();
   const { supported, speaking, speak, stop } = useSpeech();
 
   const [lang, setLang] = useState<Lang>("EN");
@@ -45,7 +46,15 @@ export function SettingsDock() {
   return (
     <>
       {/* Floating dock */}
-      <div className="fixed bottom-3 left-1/2 z-40 flex w-[min(92vw,420px)] -translate-x-1/2 items-center justify-center gap-2 sm:bottom-5 sm:w-auto sm:gap-3">
+      <div className="fixed bottom-3 left-1/2 z-40 flex w-[min(96vw,520px)] -translate-x-1/2 items-center justify-center gap-2 sm:bottom-5 sm:w-auto sm:gap-3">
+        <DockButton
+          tone="route"
+          onClick={() => setOpenRoute(true)}
+          icon={<Navigation size={16} />}
+          label={profile.label}
+          fullLabel={`${profile.label} route`}
+          badge={profile.icon}
+        />
         <DockButton
           tone="voice"
           onClick={() => setOpenVoice(true)}
@@ -61,6 +70,73 @@ export function SettingsDock() {
           fullLabel="Accessibility"
         />
       </div>
+
+      {/* Route / profile drawer */}
+      <Drawer open={openRoute} onOpenChange={setOpenRoute}>
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader className="flex flex-row items-center justify-between">
+            <DrawerTitle className="flex items-center gap-2 text-primary">
+              <Navigation size={20} /> Choose how to navigate
+            </DrawerTitle>
+            <DrawerClose className="rounded-full p-1 text-muted-foreground hover:text-foreground" aria-label="Close">✕</DrawerClose>
+          </DrawerHeader>
+
+          <div className="space-y-5 overflow-y-auto p-4 pb-8">
+            <Section title="Navigation profile">
+              <p className="mb-3 text-xs text-muted-foreground">The map and route adapt to your choice.</p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {(Object.keys(PROFILES) as ProfileId[]).map((id) => {
+                  const p = PROFILES[id];
+                  const active = profileId === id;
+                  return (
+                    <button
+                      key={id}
+                      onClick={() => setProfile(id)}
+                      aria-pressed={active}
+                      className={`flex flex-col items-start gap-1 rounded-2xl border-2 p-3 text-left transition ${
+                        active
+                          ? "border-primary bg-primary/10"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="text-xl" aria-hidden>{p.icon}</span>
+                      <span className="text-sm font-bold leading-tight">{p.label}</span>
+                      <span className="text-[11px] leading-tight text-muted-foreground">{p.tagline}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </Section>
+
+            <Section title="Fine-tune needs">
+              <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
+                {NEEDS.map((n) => {
+                  const checked = needs.has(n.id);
+                  return (
+                    <li key={n.id}>
+                      <label
+                        className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 px-3 py-2 transition ${
+                          checked ? "border-primary bg-primary/5" : "border-transparent hover:bg-secondary"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleNeed(n.id)}
+                          className="h-4 w-4 accent-primary"
+                        />
+                        <span aria-hidden className="text-base">{n.icon}</span>
+                        <span className="text-sm font-medium">{n.label}</span>
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Section>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
 
       {/* Audio & voice drawer */}
       <Drawer open={openVoice} onOpenChange={setOpenVoice}>
@@ -213,17 +289,21 @@ function DockButton({
   fullLabel,
   onClick,
   tone,
+  badge,
 }: {
   icon: React.ReactNode;
   label: string;
   fullLabel?: string;
   onClick: () => void;
-  tone: "voice" | "a11y";
+  tone: "voice" | "a11y" | "route";
+  badge?: string;
 }) {
   const grad =
     tone === "voice"
       ? "from-sky-500 to-violet-600"
-      : "from-violet-600 to-fuchsia-500";
+      : tone === "a11y"
+        ? "from-violet-600 to-fuchsia-500"
+        : "from-emerald-500 to-teal-600";
   return (
     <button
       onClick={onClick}
@@ -232,9 +312,15 @@ function DockButton({
       {icon}
       <span className="truncate sm:hidden">{label}</span>
       <span className="hidden truncate sm:inline">{fullLabel ?? label}</span>
+      {badge && (
+        <span className="ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white/25 px-1.5 text-[11px]" aria-hidden>
+          {badge}
+        </span>
+      )}
     </button>
   );
 }
+
 
 function Section({
   icon,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Headphones, Accessibility, Play, Square, Mic, MicOff } from "lucide-react";
+import { Headphones, Accessibility, Play, Square, Mic, MicOff, Navigation } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -8,7 +8,7 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { useSpeech } from "@/hooks/useSpeech";
-import { useNavigation } from "@/lib/navigation";
+import { NEEDS, PROFILES, useNavigation, type ProfileId } from "@/lib/navigation";
 
 type Lang = "IT" | "EN" | "FR" | "DE" | "ES";
 type TextSize = "normal" | "large" | "xlarge";
@@ -16,8 +16,9 @@ type TextSize = "normal" | "large" | "xlarge";
 export function SettingsDock() {
   const [openVoice, setOpenVoice] = useState(false);
   const [openA11y, setOpenA11y] = useState(false);
+  const [openRoute, setOpenRoute] = useState(false);
 
-  const { profile, audioOn, setAudioOn } = useNavigation();
+  const { profile, profileId, setProfile, needs, toggleNeed, audioOn, setAudioOn } = useNavigation();
   const { supported, speaking, speak, stop } = useSpeech();
 
   const [lang, setLang] = useState<Lang>("EN");
